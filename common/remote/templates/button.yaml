@@ -1,0 +1,24 @@
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: ${button_gpio}
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    name: ${button_friendly_name}
+    on_multi_click:
+      - timing:
+          - ON for at most 350ms
+        then:
+          - script.execute: reset_idle_timer
+          - homeassistant.event:
+              event: esphome.remote_button_pressed
+              data: {button: "${button_name}", type: "single"}
+      - timing:
+          - ON for at least 500ms
+        then:
+          - script.execute: reset_idle_timer
+          - homeassistant.event:
+              event: esphome.remote_button_pressed
+              data: {button: "${button_name}", type: "long"}
